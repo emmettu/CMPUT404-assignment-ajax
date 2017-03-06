@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 # Copyright 2013 Abram Hindle
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -94,30 +94,33 @@ def update(entity):
     for k, v in request_data.items():
         myWorld.update(entity, k, v)
         myWorld.update(entity, k, v)
-    response = Response(json.dumps(request_data))
-    response.headers["Content-Type"] = "application/json"
-    return response
+    return json_response(request_data)
 
 
 @app.route("/world", methods=['POST', 'GET'])
 def world():
     '''you should probably return the world here'''
-    return json.dumps(myWorld.world())
+    return json_response(myWorld.world())
 
 
 @app.route("/entity/<entity>")
 def get_entity(entity):
     '''This is the GET version of the entity interface,
        return a representation of the entity'''
-    return json.dumps(myWorld.get(entity))
+    return json_response(myWorld.get(entity))
 
 
 @app.route("/clear", methods=['POST', 'GET'])
 def clear():
     '''Clear the world out!'''
     myWorld.clear()
-    return json.dumps(myWorld.world())
+    return json_response(myWorld.world())
 
+
+def json_response(response):
+    response = Response(json.dumps(response))
+    response.headers["Content-Type"] = "application/json"
+    return response
 
 if __name__ == "__main__":
     app.run()
