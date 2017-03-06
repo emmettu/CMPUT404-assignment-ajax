@@ -58,8 +58,21 @@ function sendJSONXMLHTTPRequest(url, method, objects, callback) {
     // Remember to use application/json !
 }
 
-
 world = {};
+ec = 0;
+
+function rChoice(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+function rColor() {
+  return colors[ec % colors.length];
+}
+
+function rRadius() {
+  return ec % 1000;
+}
 
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
@@ -142,7 +155,10 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     //XXX: Send a XHTML Request that updates the entity you just  modified!
+    ec += 1;
     var url = "/entity/" + entity
+    data["colour"] = rColor();
+    data["radius"] = rRadius();
     sendJSONXMLHTTPRequest(url, 'POST', data, function(data) {
         world[entity] = data;
     });
@@ -252,20 +268,18 @@ mouse = (function() {
     self.mouseinstall();
     return self;
 })();
-
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x,'y':y});
 });
 
 

@@ -91,13 +91,9 @@ def update(entity):
     global myWorld
     '''update the entities via this interface'''
     request_data = flask_post_json()
-    x = request_data["x"]
-    y = request_data["y"]
-    if "colour" in request_data:
-        colour = request_data["colour"]
-        myWorld.update(entity, "colour", colour)
-    myWorld.update(entity, "x", x)
-    myWorld.update(entity, "y", y)
+    for k, v in request_data.items():
+        myWorld.update(entity, k, v)
+        myWorld.update(entity, k, v)
     response = Response(json.dumps(request_data))
     response.headers["Content-Type"] = "application/json"
     return response
