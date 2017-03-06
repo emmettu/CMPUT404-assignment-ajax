@@ -3,7 +3,7 @@
   <head> 
     <title>AJAX Assignment</title> 
     <meta charset="utf-8" /> 
-    <meta content='width=device-width; height=device-height; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
+    <meta content='width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <meta name="license" content="
         Copyright 2013 Abram Hindle
@@ -32,16 +32,19 @@ var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
 
 
-function sendJSONXMLHTTPRequest(url, objects, callback) {
+function sendJSONXMLHTTPRequest(url, method, objects, callback) {
     var xhr = new XMLHttpRequest();
+    xhr.open(method, url);
     xhr.onreadystatechange = function () {
         if (xhr.readyState==4) {
             try {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
+                    var json = JSON.parse(xhr.responseText);
+                    callback(json);
                 }
-            } 
+            }
             catch(e) {
                 alert('Error: ' + e.name);
             }
@@ -49,6 +52,9 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     };
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.send(JSON.stringify(objects));
     // Remember to use application/json !
 }
 
@@ -58,7 +64,7 @@ world = {};
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     with(context) {
-        beginPath();              
+        beginPath();
         lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
@@ -66,7 +72,7 @@ function drawCircle(context,entity) {
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        stroke();
     }
 }
 
@@ -135,9 +141,12 @@ function getPosition(e) {
 
 
 function addEntity(entity, data) {
-    world[entity] = data;
-    drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
+    var url = "/entity/" + entity
+    sendJSONXMLHTTPRequest(url, 'POST', data, function(data) {
+        world[entity] = data;
+    });
+    drawNextFrame(); // (but should we?)
 
 }
 
@@ -262,12 +271,13 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
+
+    sendJSONXMLHTTPRequest("/world", "GET", null, function(n_world) {world = n_world; drawNextFrame();});
     drawFrame();
 }
 
 // 30 frames per second
 setInterval( update, 1000/30.0);
-
 
 
     </script>
